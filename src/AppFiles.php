@@ -8,15 +8,18 @@ namespace UbaidCrudGen\LaravelCrudGen;
  */
 class AppFiles
 {
-    /** Adds the route line, replacing the line of the same route name if this CRUD was generated before. */
-    public static function routes(?string $existing, string $name, string $line): string
+    /**
+     * Adds the route line, replacing the earlier line for the same page or API.
+     * $marker is text only that line contains, e.g. "->name('crud.article');".
+     */
+    public static function routes(?string $existing, string $marker, string $line): string
     {
         $existing ??= "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\n"
-            ."// Managed by crud:generate: one route per line, replaced when the same CRUD is generated again.\n";
+            ."// Managed by the crud generator: one route per line, replaced when the same model is generated again.\n";
 
         $lines = array_filter(
             explode("\n", rtrim(str_replace("\r\n", "\n", $existing))),
-            fn ($existingLine) => ! str_contains($existingLine, "->name('{$name}');"),
+            fn ($existingLine) => ! str_contains($existingLine, $marker),
         );
 
         return implode("\n", $lines)."\n{$line}\n";

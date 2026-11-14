@@ -9,9 +9,9 @@ class AppFilesTest extends TestCase
 {
     public function test_routes_are_added_once_and_replaced_by_name(): void
     {
-        $file = AppFiles::routes(null, 'crud.article', "Route::livewire('/articles', 'pages::crud.article')->name('crud.article');");
-        $file = AppFiles::routes($file, 'crud.page', "Route::livewire('/page', 'pages::crud.page')->name('crud.page');");
-        $file = AppFiles::routes($file, 'crud.article', "Route::livewire('/admin/articles', 'pages::crud.article')->middleware(['auth'])->name('crud.article');");
+        $file = AppFiles::routes(null, "->name('crud.article');", "Route::livewire('/articles', 'pages::crud.article')->name('crud.article');");
+        $file = AppFiles::routes($file, "->name('crud.page');", "Route::livewire('/page', 'pages::crud.page')->name('crud.page');");
+        $file = AppFiles::routes($file, "->name('crud.article');", "Route::livewire('/admin/articles', 'pages::crud.article')->middleware(['auth'])->name('crud.article');");
 
         token_get_all($file, TOKEN_PARSE);
         $this->assertSame(1, substr_count($file, "->name('crud.article');"));

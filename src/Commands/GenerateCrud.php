@@ -145,7 +145,7 @@ class GenerateCrud extends Command
         $line = $generator->route($this->option('prefix') ?? $crud['prefix'] ?? '', $middleware);
 
         $path = base_path('routes/crud.php');
-        file_put_contents($path, AppFiles::routes(is_file($path) ? file_get_contents($path) : null, $generator->routeName(), $line));
+        file_put_contents($path, AppFiles::routes(is_file($path) ? file_get_contents($path) : null, "->name('{$generator->routeName()}');", $line));
         $this->components->info("Route written to routes/crud.php: {$line}");
 
         $web = base_path('routes/web.php');
