@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "UbaidCrudGen\\LaravelCrudGen\\": "src/"
+            "UbaidSaleem\\LaravelCrudGen\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "UbaidCrudGen\\LaravelCrudGen\\Tests\\": "tests/"
+            "UbaidSaleem\\LaravelCrudGen\\Tests\\": "tests/"
         }
     },
     "require": {
@@ -25,7 +25,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "UbaidCrudGen\\LaravelCrudGen\\LaravelCrudGenServiceProvider"
+                "UbaidSaleem\\LaravelCrudGen\\LaravelCrudGenServiceProvider"
             ]
         }
     },

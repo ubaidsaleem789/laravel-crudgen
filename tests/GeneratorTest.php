@@ -1,10 +1,10 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen\Tests;
+namespace UbaidSaleem\LaravelCrudGen\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use UbaidCrudGen\LaravelCrudGen\Generator;
+use UbaidSaleem\LaravelCrudGen\Generator;
 
 class GeneratorTest extends TestCase
 {

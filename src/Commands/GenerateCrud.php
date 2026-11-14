@@ -1,14 +1,14 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen\Commands;
+namespace UbaidSaleem\LaravelCrudGen\Commands;
 
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use UbaidCrudGen\LaravelCrudGen\AppFiles;
-use UbaidCrudGen\LaravelCrudGen\Generator;
+use UbaidSaleem\LaravelCrudGen\AppFiles;
+use UbaidSaleem\LaravelCrudGen\Generator;
 
 class GenerateCrud extends Command
 {

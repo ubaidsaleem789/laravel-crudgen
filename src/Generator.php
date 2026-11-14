@@ -1,6 +1,6 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen;
+namespace UbaidSaleem\LaravelCrudGen;
 
 use Illuminate\Support\Str;
 

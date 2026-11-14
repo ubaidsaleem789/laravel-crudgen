@@ -1,9 +1,9 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen\Tests;
+namespace UbaidSaleem\LaravelCrudGen\Tests;
 
 use PHPUnit\Framework\TestCase;
-use UbaidCrudGen\LaravelCrudGen\AppFiles;
+use UbaidSaleem\LaravelCrudGen\AppFiles;
 
 class AppFilesTest extends TestCase
 {

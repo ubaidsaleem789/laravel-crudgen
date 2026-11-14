@@ -1,6 +1,6 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen\Commands;
+namespace UbaidSaleem\LaravelCrudGen\Commands;
 
 use Illuminate\Console\Command;
 

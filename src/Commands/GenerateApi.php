@@ -1,6 +1,6 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen\Commands;
+namespace UbaidSaleem\LaravelCrudGen\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
-use UbaidCrudGen\LaravelCrudGen\ApiGenerator;
-use UbaidCrudGen\LaravelCrudGen\AppFiles;
+use UbaidSaleem\LaravelCrudGen\ApiGenerator;
+use UbaidSaleem\LaravelCrudGen\AppFiles;
 
 class GenerateApi extends Command
 {

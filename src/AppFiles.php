@@ -1,6 +1,6 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen;
+namespace UbaidSaleem\LaravelCrudGen;
 
 /**
  * Pure string builders for the three app files the generator maintains:

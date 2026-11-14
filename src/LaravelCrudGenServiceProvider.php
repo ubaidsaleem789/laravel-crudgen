@@ -1,11 +1,11 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen;
+namespace UbaidSaleem\LaravelCrudGen;
 
 use Illuminate\Support\ServiceProvider;
-use UbaidCrudGen\LaravelCrudGen\Commands\GenerateApi;
-use UbaidCrudGen\LaravelCrudGen\Commands\GenerateCrud;
-use UbaidCrudGen\LaravelCrudGen\Commands\InstallAssets;
+use UbaidSaleem\LaravelCrudGen\Commands\GenerateApi;
+use UbaidSaleem\LaravelCrudGen\Commands\GenerateCrud;
+use UbaidSaleem\LaravelCrudGen\Commands\InstallAssets;
 
 class LaravelCrudGenServiceProvider extends ServiceProvider
 {

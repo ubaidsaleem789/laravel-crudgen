@@ -1,6 +1,6 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen;
+namespace UbaidSaleem\LaravelCrudGen;
 
 /**
  * Helpers shared by the page generator and the API generator.

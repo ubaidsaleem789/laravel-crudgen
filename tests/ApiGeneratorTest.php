@@ -1,9 +1,9 @@
 <?php
 
-namespace UbaidCrudGen\LaravelCrudGen\Tests;
+namespace UbaidSaleem\LaravelCrudGen\Tests;
 
 use PHPUnit\Framework\TestCase;
-use UbaidCrudGen\LaravelCrudGen\ApiGenerator;
+use UbaidSaleem\LaravelCrudGen\ApiGenerator;
 
 class ApiGeneratorTest extends TestCase
 {
