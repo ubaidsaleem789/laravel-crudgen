@@ -58,6 +58,22 @@ class ApiGeneratorTest extends TestCase
         $this->assertStringContainsString("\$this->comments->map->only(['id'])", $resource);
     }
 
+    public function test_writable_richtext_is_sanitized(): void
+    {
+        $fields = ['body' => 'richtext', 'notes' => ['type' => 'json', 'repeatable' => true, 'fields' => ['para' => 'richtext']]];
+        $files = (new ApiGenerator('App\Models\Article', $fields, ['show' => ['id'], 'writable' => ['body', 'notes']] + self::FULL, [
+            'authorize' => false, 'appPath' => 'app', 'appNamespace' => 'App',
+        ]))->files();
+        $this->assertValidPhp($files);
+
+        $controller = current($files);
+
+        $this->assertStringContainsString('use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;', $controller);
+        $this->assertStringContainsString("\$data['body'] = is_string(\$data['body']) ? (new HtmlSanitizer(", $controller);
+        $this->assertStringContainsString("\$data['notes'][\$i]['para'] = is_string(\$item['para']) ? (new HtmlSanitizer(", $controller);
+        $this->assertStringNotContainsString('HtmlSanitizer', current($this->generator()->files())); // no rich text, no sanitizer
+    }
+
     public function test_read_only_api_has_no_write_code(): void
     {
         $files = $this->generator(['methods' => ['index', 'show'], 'writable' => [], 'filterable' => [], 'sortable' => [], 'searchable' => [], 'include' => []], authorize: false)->files();

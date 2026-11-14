@@ -161,6 +161,8 @@ class ApiGenerator
             'Arr::' => 'Illuminate\Support\Arr',
             'Gate::' => 'Illuminate\Support\Facades\Gate',
             'Storage::' => 'Illuminate\Support\Facades\Storage',
+            'HtmlSanitizer(' => 'Symfony\Component\HtmlSanitizer\HtmlSanitizer',
+            'HtmlSanitizerConfig' => 'Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig',
         ]);
 
         return "<?php\n\nnamespace {$this->o['appNamespace']}\\Http\\Controllers\\Api;\n\n{$imports}\n\n{$class}\n";
@@ -242,6 +244,22 @@ class ApiGenerator
                 }
                 PHP, ['{{ f }}' => $f]))
             ->implode("\n\n");
+
+        // Rich text is cleaned before it is stored, at the top level and inside repeaters.
+        $rich = collect($this->api['writable'])->flatMap(function ($f) {
+            $def = $this->fields[$f] ?? 'string';
+
+            if ($this->type($def) === 'richtext') {
+                return ["if (array_key_exists('{$f}', \$data)) {\n    \$data['{$f}'] = {$this->sanitized("\$data['{$f}']")};\n}"];
+            }
+
+            return $this->isRepeater($def)
+                ? collect($def['fields'])->filter(fn ($sub) => $this->type($sub) === 'richtext')->keys()
+                    ->map(fn ($n) => "foreach ((array) (\$data['{$f}'] ?? []) as \$i => \$item) {\n    if (is_string(\$item['{$n}'] ?? null)) {\n        \$data['{$f}'][\$i]['{$n}'] = {$this->sanitized("\$item['{$n}']", "''")};\n    }\n}")
+                : [];
+        })->implode("\n\n");
+
+        $images = trim("{$images}\n\n{$rich}");
 
         return $this->blocks(<<<'PHP'
             /** Validates with {{ model }}::rules() and returns only the fields the API may write. */

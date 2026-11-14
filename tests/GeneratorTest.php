@@ -81,6 +81,31 @@ class GeneratorTest extends TestCase
         $this->assertStringNotContainsString('#[Layout', implode($this->generate('multi', 'sfc', ['ui' => $ui, 'layout' => null])));
     }
 
+    public function test_richtext_is_sanitized_before_it_is_stored(): void
+    {
+        $code = implode($this->generate('multi', 'sfc'));
+
+        $this->assertStringContainsString('use Symfony\Component\HtmlSanitizer\HtmlSanitizer;', $code);
+        $this->assertStringContainsString("\$new['para'] = is_string(\$item['para'] ?? null) ? (new HtmlSanitizer(", $code); // inside a repeater too
+        $this->assertSame(1, preg_match('/\$record->body = (.+);/', $code, $m));
+
+        // Run the generated expression itself.
+        $clean = fn ($body) => eval('return '.strtr($m[1], [
+            '$this->body' => '$body',
+            'new HtmlSanitizer(' => 'new \Symfony\Component\HtmlSanitizer\HtmlSanitizer(',
+            'new HtmlSanitizerConfig' => 'new \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig',
+        ]).';');
+
+        $html = $clean('<p onclick="x()">Hi <strong>there</strong></p><script>alert(1)</script><a href="javascript:alert(1)">l</a><img src="https://a.test/i.png">');
+
+        $this->assertStringContainsString('<p>Hi <strong>there</strong></p>', $html);
+        $this->assertStringContainsString('<img src="https://a.test/i.png"', $html);
+        $this->assertStringNotContainsString('script', $html);
+        $this->assertStringNotContainsString('onclick', $html);
+        $this->assertNull($clean(null));
+        $this->assertSame(30_000, strlen(strip_tags($clean('<p>'.str_repeat('a', 30_000).'</p>')))); // not cut at the sanitizer's 20 000 default
+    }
+
     public function test_flux_pro_swaps_in_the_pro_stub(): void
     {
         $this->assertStringContainsString('window.Editor', implode($this->generate('single', 'sfc')));

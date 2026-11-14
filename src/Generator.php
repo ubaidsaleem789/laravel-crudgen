@@ -106,6 +106,8 @@ class Generator
             'Storage::' => 'Illuminate\Support\Facades\Storage',
             'Str::' => 'Illuminate\Support\Str',
             'UploadedFile' => 'Illuminate\Http\UploadedFile',
+            'HtmlSanitizer(' => 'Symfony\Component\HtmlSanitizer\HtmlSanitizer',
+            'HtmlSanitizerConfig' => 'Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig',
         ])
             ->filter(fn ($class, $needle) => str_contains('Component'.implode($attributes).$body, $needle))
             ->sort()
@@ -198,6 +200,10 @@ class Generator
                 PHP;
             }
 
+            if ($this->type($def) === 'richtext') {
+                return "\$record->{$f} = {$this->sanitized("\$this->{$f}")};";
+            }
+
             if (! $this->isRepeater($def)) {
                 return "\$record->{$f} = \$this->{$f};";
             }
@@ -215,7 +221,9 @@ class Generator
                     \$new['{$n}'] = \$old['{$n}'] ?? null;
                 }
                 PHP
-                : "\$new['{$n}'] = \$item['{$n}'] ?? '';")->implode("\n"), '    ');
+                : ($this->type($sub) === 'richtext'
+                    ? "\$new['{$n}'] = {$this->sanitized("\$item['{$n}'] ?? null", "''")};"
+                    : "\$new['{$n}'] = \$item['{$n}'] ?? '';"))->implode("\n"), '    ');
 
             $removed = ($paths = $this->imagePaths($def, '$old'))
                 ? "\nforeach (\$existing as \$old) {\n    Storage::disk('public')->delete(array_filter([{$paths}]));\n}\n"

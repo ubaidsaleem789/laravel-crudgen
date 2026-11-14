@@ -343,7 +343,7 @@ Parameters that are not whitelisted are ignored, not rejected. Validation errors
 - **Record id.** The id of the record being edited is a `#[Locked]` Livewire property; the browser cannot change it.
 - **Uploads.** Stored file paths only come from the saved record, never from the request. A string sent in place of a file is ignored.
 - **Errors.** Exceptions are reported to your log; the user sees a generic message.
-- **Rich text.** The editor receives saved HTML through Livewire, not printed raw into the page. The HTML itself is **not sanitized on the server**: sanitize it before you print it with `{!! !!}` on a public page.
+- **Rich text.** The editor receives saved HTML through Livewire, not printed raw into the page. Before it is stored, the HTML is cleaned with `symfony/html-sanitizer` (`allowSafeElements()`): scripts, event handlers such as `onclick`, and `javascript:` links are removed, in the page and in the API, at the top level and inside repeaters. Length is left to your `rules()` (add a `max:`). The package requires the sanitizer, so it is installed with it; if you later remove the package, keep `symfony/html-sanitizer` in your app. Records saved before this version are not cleaned until they are saved again.
 - **API.** Responses, writes, filters, sorting, search and includes are all whitelists baked into the generated controller and resource, so changing `api()` has no effect until you generate again.
 
 ## Limits

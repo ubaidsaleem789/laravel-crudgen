@@ -11,6 +11,8 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 new #[Title('Team Pages')] #[Layout('layouts::admin')] class extends Component
 {
@@ -93,7 +95,7 @@ new #[Title('Team Pages')] #[Layout('layouts::admin')] class extends Component
             $record->region_id = $this->region_id;
             $record->title = $this->title;
             $record->para = $this->para;
-            $record->body = $this->body;
+            $record->body = is_string($this->body) ? (new HtmlSanitizer((new HtmlSanitizerConfig)->allowSafeElements()->withMaxInputLength(-1)))->sanitize($this->body) : null;
             $record->published_on = $this->published_on;
             $record->active = $this->active;
             if ($this->cover instanceof UploadedFile) {
@@ -121,7 +123,7 @@ new #[Title('Team Pages')] #[Layout('layouts::admin')] class extends Component
                     $new['image'] = $old['image'] ?? null;
                 }
                 $new['title'] = $item['title'] ?? '';
-                $new['para'] = $item['para'] ?? '';
+                $new['para'] = is_string($item['para'] ?? null) ? (new HtmlSanitizer((new HtmlSanitizerConfig)->allowSafeElements()->withMaxInputLength(-1)))->sanitize($item['para'] ?? null) : '';
 
                 $items[] = $new;
             }

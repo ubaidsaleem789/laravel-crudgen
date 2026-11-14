@@ -47,6 +47,15 @@ trait BuildsCode
             ->implode(', ');
     }
 
+    /**
+     * PHP source that cleans rich text HTML (scripts, event handlers, javascript: links) before it is stored.
+     * The length is left to the model's rules; the sanitizer's own default would cut the text at 20 000 bytes.
+     */
+    private function sanitized(string $expr, string $else = 'null'): string
+    {
+        return "is_string({$expr}) ? (new HtmlSanitizer((new HtmlSanitizerConfig)->allowSafeElements()->withMaxInputLength(-1)))->sanitize({$expr}) : {$else}";
+    }
+
     private function indent(string $code, string $indent): string
     {
         return preg_replace('/^(?=.)/m', $indent, $code);
