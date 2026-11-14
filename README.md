@@ -27,7 +27,7 @@ The generated code is plain Laravel and Livewire. It lives in your app, you can 
 ## Install
 
 ```bash
-composer require --dev ubaidcrudgen/laravel-crudgen
+composer require --dev ubaidsaleem/laravel-crudgen
 ```
 
 The package is not on Packagist yet. Until it is, point Composer at your local copy first and require the `@dev` version:
@@ -37,7 +37,7 @@ composer config repositories.crudgen path ../path/to/LaravelCrudGen
 ```
 
 ```bash
-composer require --dev "ubaidcrudgen/laravel-crudgen:@dev"
+composer require --dev "ubaidsaleem/laravel-crudgen:@dev"
 ```
 
 Files are uploaded to the `public` disk, so link it once:

@@ -1,6 +1,6 @@
 ## Laravel CrudGen
 
-This app uses `ubaidcrudgen/laravel-crudgen` to generate Livewire CRUD pages and JSON APIs from static methods on a model. Prefer it over hand-writing a CRUD page or API controller.
+This app uses `ubaidsaleem/laravel-crudgen` to generate Livewire CRUD pages and JSON APIs from static methods on a model. Prefer it over hand-writing a CRUD page or API controller.
 
 ### Workflow
 
