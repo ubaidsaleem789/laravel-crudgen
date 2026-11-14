@@ -16,14 +16,14 @@
     </div>
 
     <div class="flex w-full mt-[20px] justify-between items-center">
-        <h2 class="text-xl font-bold text-gray-800">📊 {{ modelName }}</h2>
+        <h2 class="text-xl font-bold text-gray-800">{{ title }}</h2>
 
 
 
-        <button wire:click.prevent="toggleForm"
+        <button wire:click="{{ $showForm ? 'cancel' : 'create' }}"
             class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
-            {{ $showForm ? 'Close' : 'Add Tab…' }}
-            <svg wire:loading wire:target="toggleForm" class="w-4 h-4 animate-spin text-white inline-block"
+            {{ $showForm ? 'Close' : 'Add {{ modelName }}' }}
+            <svg wire:loading wire:target="create, cancel" class="w-4 h-4 animate-spin text-white inline-block"
                 fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                 </circle>
@@ -36,7 +36,7 @@
     </div>
 
     @if ($showForm)
-        <form wire:submit.prevent="submit">
+        <form wire:submit="save">
 
 
 
@@ -48,7 +48,7 @@
                 <div class="col-span-full flex justify-end items-center">
                     <button type="submit"
                         class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green ml-[1em]">Submit
-                        <svg wire:loading wire:target="submit" class="w-4 h-4 animate-spin text-blue-500 inline-block"
+                        <svg wire:loading wire:target="save" class="w-4 h-4 animate-spin text-blue-500 inline-block"
                             fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                 stroke-width="4"></circle>
@@ -74,23 +74,23 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (${{ modelName }}Render as $index => $pt)
-                    <tr class="border border-gray-200 hover:bg-gray-50 transition text-sm md:text-base">
+                @foreach ($this->records as $index => $pt)
+                    <tr wire:key="row-{{ $pt->getKey() }}" class="border border-gray-200 hover:bg-gray-50 transition text-sm md:text-base">
                         <!-- Correct Index Based on Pagination -->
                         <td class="px-2 py-2 md:px-4 md:py-3">
-                            {{ (${{ modelName }}Render->currentPage() - 1) * ${{ modelName }}Render->perPage() + $loop->index + 1 }}
+                            {{ ($this->records->currentPage() - 1) * $this->records->perPage() + $loop->index + 1 }}
                         </td>
 
                         {{ tableCells }}
 
                         <!-- Action Buttons -->
                         <td class="px-2 py-2 md:px-4 md:py-3 flex justify-center space-x-2">
-                            <button wire:click="editSildeShow({{ $pt->id }})"
+                            <button wire:click="edit({{ $pt->getKey() }})"
                                 class="text-blue-500 hover:text-blue-700 cursor-pointer">
-                                <span wire:loading.remove wire:target="editSildeShow({{ $pt->id }})">✏️</span>
+                                <span wire:loading.remove wire:target="edit({{ $pt->getKey() }})">✏️</span>
 
                                 <!-- Spinner (only visible while loading this button) -->
-                                <svg wire:loading wire:target="editSildeShow({{ $pt->id }})"
+                                <svg wire:loading wire:target="edit({{ $pt->getKey() }})"
                                     class="w-4 h-4 animate-spin text-blue-500 inline-block" fill="none"
                                     viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10"
@@ -99,7 +99,7 @@
                                         d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                                 </svg>
                             </button>
-                            <button wire:click="delete({{ $pt->id }})"
+                            <button wire:click="delete({{ $pt->getKey() }})"
                                 wire:confirm="Are you sure you want to delete this?"
                                 class="text-red-500 hover:text-red-700 cursor-pointer">
                                 🗑️
@@ -107,18 +107,18 @@
                         </td>
                     </tr>
 
-                    @if ($expandedRow === $pt->id)
-                        <tr>
+                    @if ($editingId === $pt->getKey())
+                        <tr wire:key="edit-{{ $pt->getKey() }}">
                             <td colspan="12" style="padding: 2em;">
 
-                                <form wire:submit.prevent="updateSlideShow">
+                                <form wire:submit.prevent="save">
 
                                     <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
                                         {{ fields }}
 
                                         <div class="col-span-full flex justify-end items-center">
-                                            <button type="button" wire:click.prevent="cancelBtn"
+                                            <button type="button" wire:click.prevent="cancel"
                                                 class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">Cancel</button>
                                             <button type="submit"
                                                 class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green ml-[1em]">Submit</button>
@@ -138,7 +138,7 @@
         </table>
 
         <div>
-            {{ ${{ modelName }}Render->links() }}
+            {{ $this->records->links() }}
         </div>
 
     </div>

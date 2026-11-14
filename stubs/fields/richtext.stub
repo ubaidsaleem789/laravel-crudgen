@@ -1,8 +1,9 @@
 <div class="col-span-full">
-    <label class="block text-sm/6 font-medium text-gray-900">{{ ucfirst('{{ field }}') }}</label>
+    <label class="block text-sm/6 font-medium text-gray-900">{{ label }}</label>
+    {{-- The saved HTML is handed to the editor through $wire, never printed raw into the page. --}}
     <div class="mt-2" wire:ignore x-data x-init="
-        editor{{ field }} = new window.Editor({
-            el: document.querySelector('#editor-{{ field }}'),
+        const editor = new window.Editor({
+            el: $refs.editor,
             height: '300px',
             initialEditType: 'wysiwyg',
             previewStyle: 'vertical',
@@ -16,11 +17,13 @@
             ]
         });
 
-        editor{{ field }}.on('change', () => {
-            $wire.set('{{ field }}', editor{{ field }}.getHTML());
+        editor.setHTML($wire.$get('{{ field }}') ?? '');
+
+        editor.on('change', () => {
+            $wire.$set('{{ field }}', editor.getHTML(), false);
         });
     ">
-        <div id="editor-{{ field }}">{!! ${{ field }} !!}</div>
+        <div x-ref="editor"></div>
     </div>
     @if ($errors->has("{{ errorMsg }}"))
         <span class="text-red-500 text-sm">{{ $errors->first("{{ errorMsg }}") }}</span>

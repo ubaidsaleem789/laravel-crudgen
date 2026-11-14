@@ -3,7 +3,7 @@
                                             <div class="mt-2 relative">
                                                 <select wire:model="{{ field }}"
                                                     class="w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-black sm:text-sm">
-                                                    <option>--Select {{ label }}--</option>
+                                                    <option value="">--Select {{ label }}--</option>
                                                     @foreach (\App\Models\{{ relatedModel }}::all() as $item)
                                                         <option value="{{ $item->{{ relatedKey }} }}">{{ $item->{{ relatedKey }} }}-{{ $item->{{ relatedLabel }} }}
                                                         </option>

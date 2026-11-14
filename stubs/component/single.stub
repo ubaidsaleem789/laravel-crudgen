@@ -1,0 +1,33 @@
+    use WithFileUploads;
+
+    {{ properties }}
+
+    public function mount(): void
+    {
+        if ($record = {{ model }}::first()) {
+            {{ fill }}
+        }
+    }
+
+    public function save(): void
+    {
+        $record = {{ model }}::first() ?? new {{ model }};
+        {{ authorizeSave }}
+        $this->validate({{ model }}::rules($record->getKey(), $this));
+
+        try {
+            {{ persist }}
+
+            $record->save();
+        } catch (\Throwable $e) {
+            report($e);
+            $this->dispatch('toast', type: 'error', message: 'Something went wrong. Please try again.');
+
+            return;
+        }
+
+        {{ fill }}
+        $this->dispatch('toast', type: 'success', message: 'Saved!');
+    }
+
+    {{ jsonMethods }}

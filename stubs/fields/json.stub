@@ -3,7 +3,7 @@
                                             </h3>
 
                                             @foreach (${{ field }} as $index => $item)
-                                                <div class="grid grid-cols-6 gap-4 mb-4 items-center">
+                                                <div wire:key="{{ field }}-{{ $item['uuid'] }}" class="grid grid-cols-6 gap-4 mb-4 items-center">
 
                                                     {{ subfields }}
 

@@ -1,0 +1,71 @@
+    use WithFileUploads, WithPagination;
+
+    public bool $showForm = false;
+
+    #[Locked]
+    public $editingId = null;
+
+    {{ properties }}
+
+    {{ mount }}
+
+    #[Computed]
+    public function records()
+    {
+        return {{ model }}::query(){{ with }}->paginate(10);
+    }
+
+    public function create(): void
+    {
+        {{ authorizeCreate }}
+        $this->cancel();
+        $this->showForm = true;
+    }
+
+    public function edit($id): void
+    {
+        $record = {{ model }}::findOrFail($id);
+        {{ authorizeUpdate }}
+        $this->cancel();
+        $this->editingId = $record->getKey();
+        {{ fill }}
+    }
+
+    public function cancel(): void
+    {
+        $this->resetValidation();
+        $this->reset({{ resettable }});
+    }
+
+    public function save(): void
+    {
+        $record = $this->editingId ? {{ model }}::findOrFail($this->editingId) : new {{ model }};
+        {{ authorizeSave }}
+        $this->validate({{ model }}::rules($this->editingId, $this));
+
+        try {
+            {{ persist }}
+
+            $record->save();
+        } catch (\Throwable $e) {
+            report($e);
+            $this->dispatch('toast', type: 'error', message: 'Something went wrong. Please try again.');
+
+            return;
+        }
+
+        $this->cancel();
+        $this->dispatch('toast', type: 'success', message: 'Saved!');
+    }
+
+    public function delete($id): void
+    {
+        $record = {{ model }}::findOrFail($id);
+        {{ authorizeDelete }}
+        {{ cleanup }}
+
+        $record->delete();
+        $this->dispatch('toast', type: 'success', message: 'Deleted!');
+    }
+
+    {{ jsonMethods }}
