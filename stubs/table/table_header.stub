@@ -1,0 +1,1 @@
+<th class="px-2 py-2 md:px-4 md:py-3 border capitalize">{{ ucfirst(str_replace('_', ' ', '{{ field }}')) }}</th>

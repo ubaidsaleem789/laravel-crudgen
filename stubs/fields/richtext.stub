@@ -1,0 +1,28 @@
+<div class="col-span-full">
+    <label class="block text-sm/6 font-medium text-gray-900">{{ ucfirst('{{ field }}') }}</label>
+    <div class="mt-2" wire:ignore x-data x-init="
+        editor{{ field }} = new window.Editor({
+            el: document.querySelector('#editor-{{ field }}'),
+            height: '300px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical',
+            toolbarItems: [
+                ['heading', 'bold', 'italic'],
+                ['hr', 'quote'],
+                ['ul', 'ol', 'task'],
+                ['table'],
+                ['link'],
+                ['code', 'codeblock']
+            ]
+        });
+
+        editor{{ field }}.on('change', () => {
+            $wire.set('{{ field }}', editor{{ field }}.getHTML());
+        });
+    ">
+        <div id="editor-{{ field }}">{!! ${{ field }} !!}</div>
+    </div>
+    @if ($errors->has("{{ errorMsg }}"))
+        <span class="text-red-500 text-sm">{{ $errors->first("{{ errorMsg }}") }}</span>
+    @endif
+</div>

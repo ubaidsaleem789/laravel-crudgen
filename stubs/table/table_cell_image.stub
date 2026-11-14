@@ -1,0 +1,5 @@
+<td class="px-2 py-2 md:px-4 md:py-3 border">
+    @if($pt->{{ field }})
+        <img src="{{ Storage::url($pt->{{ field }}) }}" class="w-16 h-16 object-cover rounded-md">
+    @endif
+</td>

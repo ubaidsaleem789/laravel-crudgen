@@ -1,0 +1,138 @@
+<?php
+
+namespace {{ namespace }};
+
+use Livewire\Component;
+use App\Models\{{ model }};
+use Livewire\WithFileUploads;
+use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Livewire\WithPagination;
+
+#[Layout('components.layouts.app')]
+class {{ class }} extends Component
+{
+    use WithFileUploads;
+    use WithPagination;
+
+    public bool $showForm = false;
+
+    public $expandedRow = null, $slideId;
+
+    {{ fieldsBlock }}
+
+
+    public function cancelBtn()
+    {
+        $this->resetValidation();
+        $this->reset();
+    }
+
+    public function toggleRow($id)
+    {
+        $this->expandedRow = ($this->expandedRow === $id) ? null : $id;
+    }
+
+    /* ------------------------------------------------ */
+    public function toggleForm()
+    {
+        $this->showForm = ! $this->showForm;
+    }
+
+
+    public function editSildeShow($Edir_id){
+
+        $this->toggleRow($Edir_id);
+
+        $cbl = {{ model }}::find($Edir_id);
+
+        $this->slideId = $cbl->id;
+
+         {{ editShowBlock }}
+
+
+    }
+
+    {{ jsonMethodsBlock }}
+
+
+    public function submit(){
+
+        $this->validate({{ model }}::rules(null, $this));
+
+        try {
+
+            $record = new {{ model }};
+
+            {{ saveBlock }}
+
+            // Save tab content
+            $record->save();
+
+            // Reset form and show success
+            $this->reset();
+
+            $this->showForm = false;
+
+            $this->dispatch('toast', type: 'success', message: 'Created!');
+        } catch (\Exception $e) {
+
+            $this->dispatch('toast', type: 'error', message: 'Updated Failed!' . $e->getMessage());
+        }
+
+    }
+
+    public function updateSlideShow()
+    {
+        $this->validate({{ model }}::rules($this->slideId ?? null, $this));
+
+        try {
+            // update
+            $record = {{ model }}::findOrFail($this->slideId);
+
+            {{ updateBlock }}
+
+            $record->save();
+
+            $this->dispatch(
+                'toast',
+                type: 'success',
+                message: 'Updated!'
+            );
+
+            $this->reset();
+
+
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', message: 'Error: '.$e->getMessage());
+        }
+    }
+
+
+    public function delete($id)
+    {
+        try {
+            $record = {{ model }}::findOrFail($id);
+
+            {{ deleteBlock }}
+
+            $record->delete();
+
+            $this->dispatch('toast', type: 'success', message: 'Deleted!');
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', message: 'Delete failed: ' . $e->getMessage());
+        }
+    }
+
+
+    public function render()
+    {
+        ${{ model }}Render = {{ model }}::paginate(10);
+
+        return view('livewire.Crud.multi.{{ viewName }}', [
+            '{{ model }}Render' => ${{ model }}Render
+        ]);
+    }
+
+}

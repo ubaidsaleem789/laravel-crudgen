@@ -1,0 +1,51 @@
+                    <div class="col-span-full">
+                        <label class="block text-sm font-medium text-gray-700">{{ field }} (Image):</label>
+
+                        <div
+                            class="mt-2 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 relative bg-gray-50">
+
+                            <!-- Preview -->
+
+                            @if (${{ field }})
+                            <div class="w-36 h-36 relative">
+                                <img src="{{ ${{ field }}->temporaryUrl() }}"
+                                    class="w-full h-full object-cover rounded-md shadow-md border">
+
+
+                                <button type="button" wire:click="$set('{{ field }}', null)"
+                                    class="absolute -top-2 -right-2 bg-red-600 text-white p-1.5 rounded-full shadow-md hover:bg-red-700 transition">
+                                    ✕
+                                </button>
+                            </div>
+                            @elseif (!empty(${{ field }}Show))
+                            <div class="w-36 h-36 relative">
+                                <img src="{{ Storage::url(${{ field }}Show) }}"
+                                    class="w-full h-full object-cover rounded-md shadow-md border">
+                            </div>
+                            @else
+                                <svg class="w-16 h-16 text-gray-400 mb-3" fill="none" stroke="currentColor"
+                                    stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 16v1a2 2 0 002 2h14a2 2 0 002-2v-1m-4-4l-4-4m0 0l-4 4m4-4v12"></path>
+                                </svg>
+                            @endif
+
+                            <!-- Upload Input -->
+                            <label
+                                class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition">
+                                <input type="file" wire:model="{{ field }}" accept="image/png, image/jpeg, image/jpg"
+                                    class="hidden">
+                                Choose Main Image
+                            </label>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div wire:loading wire:target="{{ field }}" class="text-sm text-gray-500 mt-2">
+                            Uploading...</div>
+
+                        <!-- Error Message -->
+                        @if ($errors->has("{{ errorMsg }}"))
+                            <span class="text-red-500 text-sm">{{ $errors->first("{{ errorMsg }}") }}</span>
+                        @endif
+
+                    </div>
