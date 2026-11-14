@@ -1,0 +1,22 @@
+<div class="col-span-full flex flex-col gap-4">
+    <flux:heading>{{ label }}</flux:heading>
+
+    @foreach (${{ field }} as $index => $item)
+        <flux:card wire:key="{{ field }}-{{ $item['uuid'] }}" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {{ subfields }}
+
+            <div class="col-span-full flex justify-end">
+                <flux:button size="sm" variant="danger" icon="trash" wire:click="remove{{ field }}('{{ $item['uuid'] }}')">Remove</flux:button>
+            </div>
+        </flux:card>
+    @endforeach
+
+    <div>
+        <flux:button size="sm" icon="plus" wire:click="add{{ field }}">Add {{ label }}</flux:button>
+    </div>
+
+    {{-- Plain @error: flux:error would also repeat the errors of the items inside. --}}
+    @error('{{ field }}')
+        <p class="text-sm font-medium text-red-500 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>

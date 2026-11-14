@@ -1,0 +1,47 @@
+{{-- The component dispatches a plain "toast" event; this line hands it to Flux. --}}
+<div class="flex flex-col gap-6" x-data
+    x-on:toast.window="$flux.toast({ text: $event.detail.message, variant: $event.detail.type === 'error' ? 'danger' : 'success' })">
+
+    <div class="flex items-center justify-between">
+        <flux:heading size="xl">{{ title }}</flux:heading>
+
+        @unless ($showForm || $editingId)
+            <flux:button variant="primary" icon="plus" wire:click="create">Add {{ modelName }}</flux:button>
+        @endunless
+    </div>
+
+    @if ($showForm || $editingId)
+        <flux:card>
+            <form wire:submit="save" class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <flux:heading size="lg" class="col-span-full">{{ $editingId ? 'Edit' : 'Add' }} {{ modelName }}</flux:heading>
+
+                {{ fields }}
+
+                <div class="col-span-full flex justify-end gap-2">
+                    <flux:button wire:click="cancel">Cancel</flux:button>
+                    <flux:button type="submit" variant="primary">Save</flux:button>
+                </div>
+            </form>
+        </flux:card>
+    @endif
+
+    <flux:table :paginate="$this->records">
+        <flux:table.columns>
+            {{ tableHeaders }}
+            <flux:table.column></flux:table.column>
+        </flux:table.columns>
+
+        <flux:table.rows>
+            @foreach ($this->records as $pt)
+                <flux:table.row :key="$pt->getKey()">
+                    {{ tableCells }}
+                    <flux:table.cell align="end">
+                        <flux:button size="sm" variant="ghost" icon="pencil-square" wire:click="edit({{ $pt->getKey() }})" />
+                        <flux:button size="sm" variant="ghost" icon="trash" wire:click="delete({{ $pt->getKey() }})"
+                            wire:confirm="Are you sure you want to delete this?" />
+                    </flux:table.cell>
+                </flux:table.row>
+            @endforeach
+        </flux:table.rows>
+    </flux:table>
+</div>

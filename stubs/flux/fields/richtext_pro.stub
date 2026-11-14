@@ -1,0 +1,3 @@
+<div class="col-span-full">
+    <flux:editor wire:model="{{ field }}" label="{{ label }}" />
+</div>

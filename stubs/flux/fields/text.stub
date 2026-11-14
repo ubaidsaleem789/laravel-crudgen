@@ -1,0 +1,3 @@
+<div class="col-span-full">
+    <flux:textarea wire:model="{{ field }}" label="{{ label }}" rows="4" />
+</div>

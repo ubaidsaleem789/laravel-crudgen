@@ -10,20 +10,11 @@ class LaravelCrudGenServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // if ($this->app->runningInConsole()) {
-        //     $this->commands([
-        //         GenerateCrud::class,
-        //     ]);
-        // }
-    }
-
-    public function register(): void
-    {
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                InstallAssets::class,
-                GenerateCrud::class, // This line registers the GenerateCrud command
-            ]);
+            $this->commands([InstallAssets::class, GenerateCrud::class]);
+
+            // php artisan vendor:publish --tag=crudgen-stubs
+            $this->publishes([__DIR__.'/../stubs' => base_path('stubs/crudgen')], 'crudgen-stubs');
         }
     }
 }

@@ -1,0 +1,5 @@
+<flux:select wire:model="{{ field }}" label="{{ label }}" placeholder="Select {{ label }}">
+    @foreach (\{{ relatedModel }}::all() as $option)
+        <flux:select.option value="{{ $option->{{ relatedKey }} }}">{{ $option->{{ relatedLabel }} }}</flux:select.option>
+    @endforeach
+</flux:select>

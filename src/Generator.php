@@ -19,7 +19,7 @@ class Generator
     /**
      * @param  array<string, string|array>  $fields  Model::fields()
      * @param  array<string, string>  $columns  table column => type
-     * @param  array{mode: string, format: string, layout: ?string, emoji: bool, authorize: bool, pagesPath: string, classPath: string, classNamespace: string, viewPath: string}  $o
+     * @param  array{mode: string, format: string, ui: string, pro: bool, stubRoots: list<string>, layout: ?string, emoji: bool, authorize: bool, pagesPath: string, classPath: string, classNamespace: string, viewPath: string}  $o
      */
     public function __construct(
         private string $modelClass,
@@ -125,12 +125,7 @@ class Generator
             'authorizeDelete' => $can("\$this->authorize('delete', \$record);"),
         ];
 
-        // A placeholder alone on its line is a block: every line of it takes the placeholder's indentation.
-        $body = preg_replace_callback(
-            '/^([ \t]*)\{\{ (\w+) \}\}$/m',
-            fn ($m) => isset($blocks[$m[2]]) ? $this->indent($blocks[$m[2]], $m[1]) : $m[0],
-            $this->stub("component/{$this->o['mode']}"),
-        );
+        $body = $this->blocks($this->stub("component/{$this->o['mode']}"), $blocks);
 
         $relations = collect($this->columns)
             ->filter(fn ($type) => str_starts_with($type, 'foreign:'))
@@ -156,6 +151,7 @@ class Generator
         return $this->each(fn ($def, $f) => match (true) {
             $this->type($def) === 'image' => "public \${$f};\n\npublic \${$f}Show;",
             $this->isRepeater($def) => "public array \${$f} = [];",
+            $this->type($def) === 'boolean' => "public \${$f} = false;",
             default => "public \${$f};",
         }, "\n\n");
     }
@@ -173,6 +169,7 @@ class Generator
         return $this->each(fn ($def, $f) => match (true) {
             $this->type($def) === 'image' => "\$this->{$f} = null;\n\$this->{$f}Show = \$record->{$f};",
             $this->isRepeater($def) => "\$this->{$f} = \$record->{$f} ?? [];",
+            $this->type($def) === 'boolean' => "\$this->{$f} = (bool) \$record->{$f};",
             $this->type($def) === 'date' => "\$this->{$f} = \$record->{$f} instanceof \\DateTimeInterface ? \$record->{$f}->format('Y-m-d') : \$record->{$f};",
             default => "\$this->{$f} = \$record->{$f};",
         });
@@ -280,40 +277,51 @@ class Generator
 
     private function view(): string
     {
-        return strtr($this->stub("{$this->o['mode']}RecordView"), [
-            '{{ fields }}' => collect($this->fields)->map(fn ($def, $name) => $this->field($name, $def))->implode("\n\n"),
-            '{{ modelName }}' => Str::headline($this->model),
-            '{{ title }}' => $this->title(),
-            '{{ tableHeaders }}' => collect($this->columns)
-                ->map(fn ($type, $name) => strtr($this->stub('table/table_header'), ['{{ field }}' => $name]))
-                ->implode("\n"),
-            '{{ tableCells }}' => collect($this->columns)->map(fn ($type, $name) => match (true) {
-                str_starts_with($type, 'foreign:') => strtr($this->stub('table/table_cell_foreign'), [
+        $table = fn (string $stub, string $name, array $extra = []) => strtr($this->stub("table/{$stub}"), [
+            '{{ field }}' => $name,
+            '{{ label }}' => Str::headline($name),
+        ] + $extra);
+
+        $blocks = [
+            'fields' => collect($this->fields)->map(fn ($def, $name) => $this->field($name, $def))->implode("\n\n"),
+            'tableHeaders' => collect($this->columns)->map(fn ($type, $name) => $table('table_header', $name))->implode("\n"),
+            'tableCells' => collect($this->columns)->map(fn ($type, $name) => match (true) {
+                str_starts_with($type, 'foreign:') => $table('table_cell_foreign', $name, [
                     '{{ relation }}' => $this->relation($type),
                     '{{ column }}' => explode(',', $type)[2] ?? 'name',
                 ]),
-                $type === 'image' => strtr($this->stub('table/table_cell_image'), ['{{ field }}' => $name]),
-                default => strtr($this->stub('table/table_cell'), ['{{ field }}' => $name]),
+                $type === 'image' => $table('table_cell_image', $name),
+                default => $table('table_cell', $name),
             })->implode("\n"),
-        ]);
+        ];
+
+        return strtr($this->blocks($this->stub($this->o['mode']), $blocks), [
+            '{{ modelName }}' => Str::headline($this->model),
+            '{{ title }}' => $this->title(),
+        ])."\n";
     }
 
     private function field(string $name, array|string $def, ?string $parent = null): string
     {
         $type = $this->type($def);
 
-        $stub = $this->stub('fields/'.match (true) {
+        $stub = 'fields/'.match (true) {
             str_starts_with($type, 'foreign') => 'foreign',
             $type === 'image' && $parent => 'image_repeatable',
             in_array($type, ['text', 'boolean', 'image', 'richtext', 'date', 'json']) => $type,
             default => 'string',
-        });
+        };
+
+        // e.g. flux/fields/richtext_pro.stub replaces richtext.stub when Flux Pro is installed.
+        $stub = $this->stub($this->o['pro'] && $this->stubPath("{$stub}_pro") ? "{$stub}_pro" : $stub);
 
         if ($type === 'json' && is_array($def['fields'] ?? null)) {
-            return strtr($stub, [
+            $subfields = collect($def['fields'])->map(fn ($sub, $n) => $this->field($n, $sub, $name))->implode("\n\n");
+
+            return strtr($this->blocks($stub, ['subfields' => $subfields]), [
                 '{{ field }}' => $name,
                 '{{ errorMsg }}' => $name,
-                '{{ subfields }}' => collect($def['fields'])->map(fn ($sub, $n) => $this->field($n, $sub, $name))->implode("\n\n"),
+                '{{ label }}' => Str::headline($name),
             ]);
         }
 
@@ -323,10 +331,10 @@ class Generator
         return strtr($stub, [
             '{{ field }}' => $parent ? "{$parent}.{{ \$index }}.{$name}" : $name,
             '{{ errorMsg }}' => $parent ? "{$parent}.\$index.{$name}" : $name,
-            '{{ label }}' => Str::headline($name),
+            '{{ label }}' => Str::headline(str_starts_with($type, 'foreign') ? Str::beforeLast($name, '_id') : $name),
             '{{ currentItemVariable }}' => '$item',
             '{{ subfieldName }}' => $name,
-            '{{ relatedModel }}' => $related,
+            '{{ relatedModel }}' => str_contains((string) $related, '\\') ? ltrim($related, '\\') : "App\\Models\\{$related}",
             '{{ relatedKey }}' => $key,
             '{{ relatedLabel }}' => $label,
         ]);
@@ -370,8 +378,39 @@ class Generator
         return preg_replace('/^(?=.)/m', $indent, $code);
     }
 
+    /**
+     * A placeholder alone on its line is a block: every line of the replacement takes the placeholder's indentation.
+     * Placeholders that share a line with other text are replaced as-is.
+     */
+    private function blocks(string $stub, array $blocks): string
+    {
+        $stub = preg_replace_callback(
+            '/^([ \t]*)\{\{ (\w+) \}\}$/m',
+            fn ($m) => isset($blocks[$m[2]]) ? $this->indent($blocks[$m[2]], $m[1]) : $m[0],
+            $stub,
+        );
+
+        return strtr($stub, collect($blocks)->mapWithKeys(fn ($code, $key) => ["{{ {$key} }}" => $code])->all());
+    }
+
+    /** First match wins: the app's stubs before the package's, the UI preset before shared stubs. */
+    private function stubPath(string $name): ?string
+    {
+        foreach ($this->o['stubRoots'] as $root) {
+            foreach (["{$root}/{$this->o['ui']}/{$name}.stub", "{$root}/{$name}.stub"] as $path) {
+                if (is_file($path)) {
+                    return $path;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private function stub(string $name): string
     {
-        return str_replace("\r\n", "\n", file_get_contents(__DIR__."/../stubs/{$name}.stub"));
+        $path = $this->stubPath($name) ?? throw new \RuntimeException("Stub [{$name}] not found for the [{$this->o['ui']}] UI.");
+
+        return str_replace("\r\n", "\n", rtrim(file_get_contents($path)));
     }
 }

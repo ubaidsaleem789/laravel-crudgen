@@ -1,5 +1,5 @@
                                         <div class="col-span-full">
-                                            <h3 class="text-xl font-bold text-gray-800 mb-2">{{ field }}
+                                            <h3 class="text-xl font-bold text-gray-800 mb-2">{{ label }}
                                             </h3>
 
                                             @foreach (${{ field }} as $index => $item)
@@ -32,7 +32,7 @@
                                             <div class="col-span-full flex justify-end items-center">
                                                 <button type="button" wire:click="add{{ field }}"
                                                     class="mt-2 rounded-md bg-gray-800 px-3 py-2 text-sm text-white hover:bg-black">
-                                                    <span wire:loading.remove wire:target="add{{ field }}" >+ Add {{ field }}</span>
+                                                    <span wire:loading.remove wire:target="add{{ field }}" >+ Add {{ label }}</span>
                                                     <svg wire:loading wire:target="add{{ field }}"
                                                         class="w-4 h-4 animate-spin text-white inline-block" fill="none"
                                                         viewBox="0 0 24 24">

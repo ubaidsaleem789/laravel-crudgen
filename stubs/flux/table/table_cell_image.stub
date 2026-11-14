@@ -1,0 +1,5 @@
+<flux:table.cell>
+    @if ($pt->{{ field }})
+        <img src="{{ Storage::disk('public')->url($pt->{{ field }}) }}" alt="" class="size-10 rounded object-cover">
+    @endif
+</flux:table.cell>

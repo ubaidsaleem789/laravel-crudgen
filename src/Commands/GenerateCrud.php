@@ -2,6 +2,7 @@
 
 namespace UbaidCrudGen\LaravelCrudGen\Commands;
 
+use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Gate;
 use UbaidCrudGen\LaravelCrudGen\Generator;
@@ -14,6 +15,7 @@ class GenerateCrud extends Command
         {--sfc : Single-file component}
         {--mfc : Multi-file component}
         {--class : Class-based component}
+        {--ui= : UI preset: flux, tailwind, or your own folder in stubs/crudgen (default: flux when installed)}
         {--layout= : Layout for the page, e.g. layouts::admin (default: livewire.component_layout)}
         {--force : Overwrite files that already exist}';
 
@@ -63,7 +65,20 @@ class GenerateCrud extends Command
 
         $authorize = Gate::getPolicyFor($modelClass) !== null;
 
+        // Stubs published to stubs/crudgen (vendor:publish --tag=crudgen-stubs) win over the package's own.
+        $stubRoots = [base_path('stubs/crudgen'), dirname(__DIR__, 2).'/stubs'];
+        $ui = $this->option('ui') ?: (class_exists(\Flux\Flux::class) ? 'flux' : 'tailwind');
+
+        if (! array_filter($stubRoots, fn ($root) => is_dir("{$root}/{$ui}"))) {
+            $this->components->error("Unknown UI [{$ui}]: no {$ui} folder in stubs/crudgen or in the package stubs.");
+
+            return self::FAILURE;
+        }
+
         $generator = new Generator($modelClass, $fields, $columns, [
+            'ui' => $ui,
+            'pro' => InstalledVersions::isInstalled('livewire/flux-pro'),
+            'stubRoots' => $stubRoots,
             'mode' => $this->option('singleRecord') ? 'single' : 'multi',
             'format' => $format,
             'layout' => $this->option('layout'),
@@ -91,6 +106,10 @@ class GenerateCrud extends Command
 
         if (! $authorize) {
             $this->components->warn("No policy found for {$modelClass}: the page is protected only by its route middleware. Create a policy and re-run with --force to add authorization checks.");
+        }
+
+        if (str_contains(implode($files), 'window.Editor')) {
+            $this->components->warn('The rich text field uses Toast UI Editor: run "php artisan crudgen:install-assets", then "npm install @toast-ui/editor" and rebuild.');
         }
 
         $this->line('  Add this route (inside your auth middleware group):');

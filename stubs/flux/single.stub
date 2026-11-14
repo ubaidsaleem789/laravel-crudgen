@@ -1,0 +1,14 @@
+{{-- The component dispatches a plain "toast" event; this line hands it to Flux. --}}
+<div class="flex flex-col gap-6" x-data
+    x-on:toast.window="$flux.toast({ text: $event.detail.message, variant: $event.detail.type === 'error' ? 'danger' : 'success' })">
+
+    <flux:heading size="xl">{{ title }}</flux:heading>
+
+    <form wire:submit="save" class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {{ fields }}
+
+        <div class="col-span-full flex justify-end">
+            <flux:button type="submit" variant="primary">Save</flux:button>
+        </div>
+    </form>
+</div>

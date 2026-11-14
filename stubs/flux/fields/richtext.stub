@@ -1,0 +1,24 @@
+{{-- Flux Pro is not installed, so this uses Toast UI Editor (php artisan crudgen:install-assets). --}}
+<flux:field class="col-span-full">
+    <flux:label>{{ label }}</flux:label>
+
+    {{-- The saved HTML is handed to the editor through $wire, never printed raw into the page. --}}
+    <div wire:ignore x-data x-init="
+        const editor = new window.Editor({
+            el: $refs.editor,
+            height: '300px',
+            initialEditType: 'wysiwyg',
+            usageStatistics: false,
+        });
+
+        editor.setHTML($wire.$get('{{ field }}') ?? '');
+
+        editor.on('change', () => {
+            $wire.$set('{{ field }}', editor.getHTML(), false);
+        });
+    ">
+        <div x-ref="editor"></div>
+    </div>
+
+    <flux:error name="{{ field }}" />
+</flux:field>

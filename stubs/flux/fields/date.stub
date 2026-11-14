@@ -1,0 +1,1 @@
+<flux:input type="date" wire:model="{{ field }}" label="{{ label }}" />

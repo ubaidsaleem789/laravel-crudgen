@@ -1,0 +1,9 @@
+                    <div class="sm:col-span-3">
+                        <label class="flex items-center gap-2 text-sm font-medium text-gray-900">
+                            <input type="checkbox" wire:model="{{ field }}" class="size-4 rounded border-gray-300">
+                            {{ label }}
+                        </label>
+                        @if ($errors->has("{{ errorMsg }}"))
+                            <span class="text-red-500 text-sm">{{ $errors->first("{{ errorMsg }}") }}</span>
+                        @endif
+                    </div>

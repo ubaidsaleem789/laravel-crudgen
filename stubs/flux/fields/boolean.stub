@@ -1,0 +1,1 @@
+<flux:switch wire:model="{{ field }}" label="{{ label }}" align="left" />

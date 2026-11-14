@@ -1,0 +1,13 @@
+<div class="flex flex-col gap-2">
+    <flux:input type="file" wire:model="{{ field }}" label="{{ label }}" accept="image/*" />
+
+    @php
+        $value = $item['{{ subfieldName }}'] ?? null;
+    @endphp
+
+    @if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile && $value->isPreviewable())
+        <img src="{{ $value->temporaryUrl() }}" alt="" class="size-24 rounded-lg object-cover">
+    @elseif (is_string($value) && $value !== '')
+        <img src="{{ Storage::disk('public')->url($value) }}" alt="" class="size-24 rounded-lg object-cover">
+    @endif
+</div>

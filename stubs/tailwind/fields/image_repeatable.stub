@@ -10,11 +10,11 @@
             $value = {{ currentItemVariable }}['{{ subfieldName }}'] ?? null;
         @endphp
 
-        @if (isset($value) && is_object($value))
+        @if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile && $value->isPreviewable())
             <img src="{{ $value->temporaryUrl() }}"
                 class="w-36 h-36 object-cover rounded-md shadow-md border">
-        @elseif (isset($value) && is_string($value))
-            <img src="{{ Storage::url($value) }}"
+        @elseif (is_string($value) && $value !== '')
+            <img src="{{ Storage::disk('public')->url($value) }}"
                 class="w-36 h-36 object-cover rounded-md shadow-md border">
         @else
             <svg class="w-16 h-16 text-gray-400 mb-3" fill="none"

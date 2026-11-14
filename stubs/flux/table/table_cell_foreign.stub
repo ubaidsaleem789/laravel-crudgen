@@ -1,0 +1,1 @@
+<flux:table.cell>{{ $pt->{{ relation }}?->{{ column }} }}</flux:table.cell>

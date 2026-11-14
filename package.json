@@ -1,9 +1,7 @@
 {
   "name": "ubaidcrudgen-laravel-crudgen",
   "private": true,
-  "scripts": {},
   "devDependencies": {
-    "@toast-ui/editor": "^3.2.2",
-    "flatpickr": "^4.6.13"
+    "@toast-ui/editor": "^3.2.2"
   }
 }

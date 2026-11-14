@@ -6,7 +6,7 @@
 
                             <!-- Preview -->
 
-                            @if (${{ field }})
+                            @if (${{ field }} instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile && ${{ field }}->isPreviewable())
                             <div class="w-36 h-36 relative">
                                 <img src="{{ ${{ field }}->temporaryUrl() }}"
                                     class="w-full h-full object-cover rounded-md shadow-md border">
@@ -19,7 +19,7 @@
                             </div>
                             @elseif (!empty(${{ field }}Show))
                             <div class="w-36 h-36 relative">
-                                <img src="{{ Storage::url(${{ field }}Show) }}"
+                                <img src="{{ Storage::disk('public')->url(${{ field }}Show) }}"
                                     class="w-full h-full object-cover rounded-md shadow-md border">
                             </div>
                             @else
