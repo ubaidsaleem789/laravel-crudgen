@@ -1,0 +1,16 @@
+{{-- Sidebar links for generated CRUD pages. Entries live in config/crud-nav.php. --}}
+@php
+    $crudNav = collect(config('crud-nav', []))
+        ->filter(fn ($item, $route) => Route::has($route))
+        ->groupBy(fn ($item) => $item['group'] ?? '', preserveKeys: true);
+@endphp
+
+@foreach ($crudNav as $group => $items)
+    <flux:sidebar.group :heading="$group !== '' ? __($group) : null" class="grid">
+        @foreach ($items as $route => $item)
+            <flux:sidebar.item :icon="$item['icon'] ?? null" :href="route($route)" :current="request()->routeIs($route)" wire:navigate>
+                {{ __($item['label']) }}
+            </flux:sidebar.item>
+        @endforeach
+    </flux:sidebar.group>
+@endforeach

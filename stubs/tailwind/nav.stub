@@ -1,0 +1,19 @@
+{{-- Sidebar links for generated CRUD pages. Entries live in config/crud-nav.php. --}}
+@php
+    $crudNav = collect(config('crud-nav', []))
+        ->filter(fn ($item, $route) => Route::has($route))
+        ->groupBy(fn ($item) => $item['group'] ?? '', preserveKeys: true);
+@endphp
+
+@foreach ($crudNav as $group => $items)
+    @if ($group !== '')
+        <p class="mt-4 px-3 text-xs font-semibold uppercase text-gray-500">{{ __($group) }}</p>
+    @endif
+
+    @foreach ($items as $route => $item)
+        <a href="{{ route($route) }}"
+            class="block rounded-md px-3 py-2 text-sm {{ request()->routeIs($route) ? 'bg-gray-100 font-semibold text-gray-900' : 'text-gray-700 hover:bg-gray-50' }}">
+            {{ __($item['label']) }}
+        </a>
+    @endforeach
+@endforeach

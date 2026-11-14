@@ -49,18 +49,29 @@ class Generator
         };
     }
 
-    /** The route line the user has to add (written automatically in a later phase). */
-    public function route(): string
+    public function routeName(): string
     {
-        $uri = $this->o['mode'] === 'multi' ? Str::plural($this->slug) : $this->slug;
+        return "crud.{$this->slug}";
+    }
+
+    /** @param  list<string>  $middleware */
+    public function route(string $prefix = '', array $middleware = []): string
+    {
+        $uri = trim($prefix.'/'.($this->o['mode'] === 'multi' ? Str::plural($this->slug) : $this->slug), '/');
         $target = $this->o['format'] === 'class'
             ? "\\{$this->o['classNamespace']}\\Crud\\{$this->model}Crud::class"
             : "'pages::crud.{$this->slug}'";
+        $middleware = $middleware ? "->middleware(['".implode("', '", $middleware)."'])" : '';
 
-        return "Route::livewire('/{$uri}', {$target})->name('crud.{$this->slug}');";
+        return "Route::livewire('/{$uri}', {$target}){$middleware}->name('{$this->routeName()}');";
     }
 
-    private function title(): string
+    public function navStub(): string
+    {
+        return $this->stub('nav')."\n";
+    }
+
+    public function title(): string
     {
         return Str::headline($this->o['mode'] === 'multi' ? Str::plural($this->model) : $this->model);
     }
