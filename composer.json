@@ -2,7 +2,9 @@
     "name": "ubaidsaleem/laravel-crudgen",
     "description": "Generate Livewire 4 CRUD pages from a model's fields() definition",
     "type": "library",
+    "keywords": ["laravel", "livewire", "crud", "generator", "flux", "api"],
     "license": "MIT",
+    "authors": [{"name": "Ubaid Saleem"}],
     "autoload": {
         "psr-4": {
             "UbaidSaleem\\LaravelCrudGen\\": "src/"
