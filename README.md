@@ -48,19 +48,11 @@ If you already have an app with Livewire 4, skip this step.
 
 ### 2. Install the package
 
-The package is not on Packagist yet, so Composer has to be told where your copy of it is. Run this inside your Laravel app and change the path to the folder where the package is on your computer:
+Run this inside your Laravel app:
 
 ```bash
-composer config repositories.crudgen path ../path/to/LaravelCrudGen
+composer require ubaidsaleem/laravel-crudgen
 ```
-
-Then install it:
-
-```bash
-composer require "ubaidsaleem/laravel-crudgen:@dev"
-```
-
-Once the package is on Packagist, the first command is not needed and the second one becomes `composer require ubaidsaleem/laravel-crudgen`.
 
 ### 3. Link the storage folder
 
